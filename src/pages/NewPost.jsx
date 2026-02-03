@@ -7,7 +7,7 @@ import { ADD_FEED_POST } from "../service/graphql/mutations/feed";
 import { GET_FEED_BY_CATEGORY, GET_FEEDS } from "../service/graphql/queries";
 
 function NewPost({ onNavigateToFeed }) {
-  const [addFeedPost, { loading, error }] = useMutation(ADD_FEED_POST, {
+  const [addFeedPost, { loading }] = useMutation(ADD_FEED_POST, {
     refetchQueries: [
       {
         query: GET_FEEDS,
@@ -16,6 +16,43 @@ function NewPost({ onNavigateToFeed }) {
         query: GET_FEED_BY_CATEGORY,
       },
     ],
+    update(cache, { data: { createFeed } }) {
+      try {
+        const existingFeed = cache.readQuery({ query: GET_FEEDS });
+        if (existingFeed) {
+          cache.writeQuery({
+            query: GET_FEEDS,
+            data: {
+              ...existingFeed,
+              allFeeds: [...existingFeed.allFeeds, createFeed],
+            },
+          });
+        }
+      } catch (error) {
+        console.warn("Erro ao salvar feed no cache:", error);
+      }
+
+      try {
+        const existingCategoryFeed = cache.readQuery({
+          query: GET_FEED_BY_CATEGORY,
+          variables: { category: createFeed.category },
+        });
+        if (existingCategoryFeed) {
+          cache.writeQuery({
+            query: GET_FEED_BY_CATEGORY,
+            variables: { category: createFeed.category },
+            data: {
+              feedByCategory: [
+                createFeed,
+                ...existingCategoryFeed.feedByCategory,
+              ],
+            },
+          });
+        }
+      } catch (error) {
+        console.warn("Erro ao salvar feed por categoria no cache:", error);
+      }
+    },
   });
 
   const handleSubmit = async (formData) => {
