@@ -1,14 +1,14 @@
 export const users = [
   {
     id: 1,
-    name: "Pedro Mello",
-    username: "pedromello",
-    email: "pedro.mello@teste.com",
+    name: "Letox da silva",
+    username: "letox",
+    email: "letox.dev@teste.com",
     password: "123123",
     phone: "11999999999",
     city: "Sao Paulo",
     state: "SP",
-    bio: "Adoro correr pela manha!",
+    bio: "Adoro andar de bike pela manha!",
   },
 ];
 export const feed = [
